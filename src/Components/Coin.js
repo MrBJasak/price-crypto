@@ -20,11 +20,11 @@ const Coin = () => {
     const [coins, setCoins] = useState([]);
     const [searchName, setSearchName] = useState('');
     const [order, setOrder] = useState('ASC');
-
+    const [currency, setCurrency] = useState('PLN');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
-    const api = API_URL('PLN', 50);
+    const api = API_URL(currency.toLowerCase(), 50);
 
     const sortCoin = (col) => {
         if (order === 'ASC') {
@@ -37,16 +37,17 @@ const Coin = () => {
             setOrder('ASC');
         }
     };
+
     const filterCoins = coins.filter((item) =>
         item.name.toLowerCase().includes(searchName.toLowerCase())
     );
 
     const handleChangePage = (newPage) => {
-        setPage(newPage);
+        setPage(+newPage);
     };
 
     const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
+        setRowsPerPage(event.target.value);
         setPage(0);
     };
 
@@ -67,18 +68,26 @@ const Coin = () => {
 
     useEffect(() => {
         fetchData(api);
-    }, [api, setCoins]);
+    }, [api, setCoins, currency]);
 
     return (
         <Box>
-            <Form onChange={handleInputValue} />
+            <Form
+                onChange={handleInputValue}
+                setCurrencyState={setCurrency}
+                currencyState={currency}
+            />
             <div>
                 <Paper sx={{ width: '100%', overflow: 'hidden' }}>
                     <TableContainer
                         sx={{ height: '85vh', '&::-webkit-scrollbar': { display: 'none' } }}
                     >
                         <Table stickyHeader aria-label="sticky table">
-                            <TableHeader />
+                            <TableHeader
+                                currencyState={currency}
+                                onClick={sortCoin}
+                                filterCoins={filterCoins}
+                            />
                             {filterCoins
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((item, index) => (
@@ -92,11 +101,12 @@ const Coin = () => {
                                         price={item.current_price}
                                         priceChange={item.price_change_percentage_24h}
                                         marketcap={item.total_volume}
+                                        currencyState={currency}
                                     />
                                 ))}
                             {filterCoins.length === 0 && (
-                                <TableCell colSpan={6}>
-                                    <Typography align="center" variant="h1">
+                                <TableCell colSpan={7}>
+                                    <Typography align="center" variant="h2">
                                         {'Not found Crypto :('}
                                     </Typography>
                                 </TableCell>

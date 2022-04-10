@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import {
     TextField,
@@ -10,11 +10,9 @@ import {
     MenuItem,
 } from '@mui/material';
 
-const Form = ({ onChange }) => {
-    const [currency, setCurrency] = useState('');
-
+const Form = ({ onChange, setCurrencyState, currencyState }) => {
     const handleChangeCurrency = (event) => {
-        setCurrency(event.target.value);
+        setCurrencyState(event.target.value);
     };
 
     return (
@@ -26,13 +24,13 @@ const Form = ({ onChange }) => {
                     <Select
                         labelId="currency-label"
                         id="currency-label"
-                        value={currency}
+                        value={currencyState}
                         onChange={handleChangeCurrency}
                         label="Currency"
                     >
                         <MenuItem value={'PLN'}>PLN</MenuItem>
                         <MenuItem value={'USD'}>USD</MenuItem>
-                        <MenuItem value={'EURO'}>EURO</MenuItem>
+                        <MenuItem value={'EUR'}>EURO</MenuItem>
                     </Select>
                 </FormControl>
             </Box>

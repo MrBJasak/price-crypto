@@ -1,17 +1,5 @@
 import React from 'react';
-import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    Avatar,
-    Typography,
-    Stack,
-} from '@mui/material';
+import { TableBody, TableCell, TableRow, Avatar, Typography, Stack } from '@mui/material';
 
 const CoinDetails = ({
     id,
@@ -22,7 +10,7 @@ const CoinDetails = ({
     volume,
     priceChange,
     marketcap,
-    sortCoin,
+    currencyState,
 }) => {
     return (
         <TableBody>
@@ -35,7 +23,7 @@ const CoinDetails = ({
                     </Stack>
                 </TableCell>
                 <TableCell>{symbol.toUpperCase()}</TableCell>
-                <TableCell>{price}</TableCell>
+                <TableCell>{parseFloat(price).toFixed(2)}</TableCell>
                 <TableCell>{volume.toLocaleString()}</TableCell>
                 {priceChange < 0 ? (
                     <TableCell sx={{ color: 'red' }}>{priceChange.toFixed(2)}%</TableCell>
