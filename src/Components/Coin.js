@@ -1,11 +1,59 @@
 import axios from 'axios';
-import React, { useState, useEffect, useRef } from 'react';
-import { API_URL } from './Util/util';
+import React, { useState, useEffect } from 'react';
+
+import API_URL from './Util/util';
 import CoinDetails from './CoinDetails';
+import TableHeader from './TableHeader';
+
+import Form from './Form';
+import {
+    Paper,
+    Table,
+    Typography,
+    TableCell,
+    TableContainer,
+    TablePagination,
+    Box,
+} from '@mui/material';
 
 const Coin = () => {
     const [coins, setCoins] = useState([]);
     const [searchName, setSearchName] = useState('');
+    const [order, setOrder] = useState('ASC');
+
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const api = API_URL('PLN', 50);
+
+    const sortCoin = (col) => {
+        if (order === 'ASC') {
+            const sorted = [...coins].sort((a, b) => (a[col] > b[col] ? 1 : -1));
+            setCoins(sorted);
+            setOrder('DESC');
+        } else {
+            const sorted = [...coins].sort((a, b) => (a[col] < b[col] ? 1 : -1));
+            setCoins(sorted);
+            setOrder('ASC');
+        }
+    };
+    const filterCoins = coins.filter((item) =>
+        item.name.toLowerCase().includes(searchName.toLowerCase())
+    );
+
+    const handleChangePage = (newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
+    };
+
+    const handleInputValue = (event) => {
+        event.preventDefault();
+        setSearchName(event.target.value);
+    };
 
     const fetchData = (api) => {
         axios
@@ -18,43 +66,55 @@ const Coin = () => {
     };
 
     useEffect(() => {
-        fetchData(API_URL);
-    }, []);
+        fetchData(api);
+    }, [api, setCoins]);
 
-    const filterCoins = coins.filter((item) =>
-        item.name.toLowerCase().includes(searchName.toLowerCase())
-    );
-    // const sortCoins = coins.sort(item)
     return (
-        <div>
+        <Box>
+            <Form onChange={handleInputValue} />
             <div>
-                <h1>Search</h1>
-                <form>
-                    <input
-                        type="text"
-                        placeholder={'Search your Crypto'}
-                        onChange={(event) => {
-                            setSearchName(event.target.value);
-                            console.log(searchName);
-                        }}
+                <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+                    <TableContainer
+                        sx={{ height: '85vh', '&::-webkit-scrollbar': { display: 'none' } }}
+                    >
+                        <Table stickyHeader aria-label="sticky table">
+                            <TableHeader />
+                            {filterCoins
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((item, index) => (
+                                    <CoinDetails
+                                        id={index}
+                                        key={item.id}
+                                        image={item.image}
+                                        name={item.name}
+                                        symbol={item.symbol}
+                                        volume={item.market_cap}
+                                        price={item.current_price}
+                                        priceChange={item.price_change_percentage_24h}
+                                        marketcap={item.total_volume}
+                                    />
+                                ))}
+                            {filterCoins.length === 0 && (
+                                <TableCell colSpan={6}>
+                                    <Typography align="center" variant="h1">
+                                        {'Not found Crypto :('}
+                                    </Typography>
+                                </TableCell>
+                            )}
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[10, 25, 100]}
+                        component="div"
+                        count={filterCoins.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
                     />
-                </form>
+                </Paper>
             </div>
-            <div>
-                {filterCoins.map((item) => (
-                    <CoinDetails
-                        key={item.id}
-                        image={item.image}
-                        name={item.name}
-                        symbol={item.symbol}
-                        volume={item.market_cap}
-                        price={item.current_price}
-                        priceChange={item.price_change_percentage_24h}
-                        marketcap={item.total_volume}
-                    />
-                ))}
-            </div>
-        </div>
+        </Box>
     );
 };
 
