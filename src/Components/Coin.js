@@ -24,6 +24,15 @@ const Coin = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
+    };
+
     const api = API_URL(currency.toLowerCase(), 50);
 
     const sortCoin = (col) => {
@@ -36,24 +45,6 @@ const Coin = () => {
             setCoins(sorted);
             setOrder('ASC');
         }
-    };
-
-    const filterCoins = coins.filter((item) =>
-        item.name.toLowerCase().includes(searchName.toLowerCase())
-    );
-
-    const handleChangePage = (newPage) => {
-        setPage(+newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(event.target.value);
-        setPage(0);
-    };
-
-    const handleInputValue = (event) => {
-        event.preventDefault();
-        setSearchName(event.target.value);
     };
 
     const fetchData = (api) => {
@@ -69,6 +60,15 @@ const Coin = () => {
     useEffect(() => {
         fetchData(api);
     }, [api, setCoins, currency]);
+
+    const filterCoins = coins.filter((item) =>
+        item.name.toLowerCase().includes(searchName.toLowerCase())
+    );
+
+    const handleInputValue = (event) => {
+        event.preventDefault();
+        setSearchName(event.target.value);
+    };
 
     return (
         <Box>
@@ -114,7 +114,7 @@ const Coin = () => {
                         </Table>
                     </TableContainer>
                     <TablePagination
-                        rowsPerPageOptions={[10, 25, 100]}
+                        rowsPerPageOptions={[10, 20, 50]}
                         component="div"
                         count={filterCoins.length}
                         rowsPerPage={rowsPerPage}
